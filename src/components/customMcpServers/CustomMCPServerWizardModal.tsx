@@ -30,6 +30,7 @@ interface WizardData {
   // Step 2 — Connection
   url: string;
   headers: Record<string, unknown>;
+  credential_refs: Record<string, string>;
   // Step 3 — Advanced
   timeout: number;
   retry_count: number;
@@ -41,6 +42,7 @@ const initialWizardData: WizardData = {
   tags: [],
   url: '',
   headers: {},
+  credential_refs: {},
   timeout: 30,
   retry_count: 3,
 };
@@ -51,6 +53,7 @@ const serverToWizardData = (server: CustomMcpServer): WizardData => ({
   tags: server.tags || [],
   url: server.url || '',
   headers: (server.headers as Record<string, unknown>) || {},
+  credential_refs: server.credential_refs || {},
   timeout: server.timeout ?? 30,
   retry_count: server.retry_count ?? 3,
 });
@@ -118,6 +121,7 @@ export default function CustomMCPServerWizardModal({
       description: data.description.trim() || '',
       url: data.url.trim(),
       headers: data.headers,
+      credential_refs: data.credential_refs,
       timeout: data.timeout,
       retry_count: data.retry_count,
       tags: data.tags,
@@ -145,6 +149,7 @@ export default function CustomMCPServerWizardModal({
             data={{
               url: data.url,
               headers: data.headers,
+              credential_refs: data.credential_refs,
             }}
             onChange={d => setData(prev => ({ ...prev, ...d }))}
             onNext={handleNext}
