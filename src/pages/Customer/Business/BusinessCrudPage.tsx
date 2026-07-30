@@ -268,6 +268,25 @@ export default function BusinessCrudPage({
     }
   };
 
+  const sendContractByWhatsApp = (record: BusinessRecord) => {
+    const token = String(record.public_token || '');
+    if (!token) {
+      toast.error('Este contrato ainda não possui link de assinatura.');
+      return;
+    }
+    const contact = record.contact as ContactOption | undefined;
+    const phone = String(contact?.phone_number || '').replace(/\D/g, '');
+    const link = `${window.location.origin}/contracts/sign/${token}`;
+    const message = `Olá${contact?.name ? ` ${contact.name}` : ''}! Segue o contrato para leitura e assinatura: ${link}`;
+
+    if (!phone) {
+      navigator.clipboard.writeText(link);
+      toast.success('Link de assinatura copiado.');
+      return;
+    }
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+  };
+
   const empty = useMemo(() => !loading && records.length === 0, [loading, records.length]);
 
   return (
@@ -319,6 +338,9 @@ export default function BusinessCrudPage({
                 )}
                 {resource === 'contracts' && record.status !== 'signed' && (
                   <Button size="icon" variant="ghost" title="Assinar" onClick={() => setSignatureTarget(record)}><Edit3 className="h-4 w-4" /></Button>
+                )}
+                {resource === 'contracts' && (
+                  <Button size="icon" variant="ghost" title="Enviar para assinatura no WhatsApp" onClick={() => sendContractByWhatsApp(record)}><MessageCircle className="h-4 w-4 text-emerald-500" /></Button>
                 )}
                 {resource === 'contracts' && (
                   <Button size="icon" variant="ghost" title="Abrir PDF" onClick={() => {

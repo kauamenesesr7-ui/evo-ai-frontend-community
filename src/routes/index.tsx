@@ -29,6 +29,7 @@ import MicrosoftCallback from '@/pages/MicrosoftCallback';
 import SurveyResponse from '@/pages/Public/Survey/SurveyResponse';
 import PublicChatPage from '@/pages/Public/Chat/ChatPage';
 import FormPage from '@/pages/Public/Form/FormPage';
+import ContractSigning from '@/pages/Public/ContractSigning';
 
 // Páginas customer
 import Dashboard from '@/pages/Customer/Dashboard';
@@ -135,6 +136,8 @@ const AppRouter = () => {
     <BrowserRouter>
       <RouterGuard>
         <Routes>
+          <Route path="/contracts/sign/:token" element={<ContractSigning />} />
+
           {/* Redirecionamento inteligente da raiz baseado no tipo de usuário */}
           <Route
             path="/"
