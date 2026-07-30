@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@evoapi/design-system';
 import BusinessCrudPage from './BusinessCrudPage';
+import ContractTemplatesManager from './ContractTemplatesManager';
 
 export default function Contracts() {
   const [view, setView] = useState<'contracts' | 'templates'>('contracts');
@@ -30,7 +31,7 @@ export default function Contracts() {
               { key: 'title', label: 'Título', required: true },
               { key: 'issued_on', label: 'Data de emissão', type: 'date', required: true },
               { key: 'company_signer_name', label: 'Responsável da empresa' },
-              { key: 'content', label: 'Conteúdo do contrato', type: 'textarea', required: true },
+              { key: 'content', label: 'Conteúdo personalizado (opcional)', type: 'textarea' },
             ]}
             columns={[
               { key: 'number', label: 'Número' }, { key: 'title', label: 'Contrato' },
@@ -38,35 +39,7 @@ export default function Contracts() {
               { key: 'status', label: 'Situação', format: 'status' },
             ]}
           />
-        ) : (
-          <BusinessCrudPage
-            resource="contract_templates"
-            rootKey="contract_template"
-            title="Modelos de contrato"
-            subtitle="Edite cláusulas com versionamento: contratos antigos nunca são alterados."
-            singular="Modelo"
-            defaults={{ version: 1, is_default: true }}
-            fields={[
-              { key: 'name', label: 'Nome do modelo', required: true },
-              {
-                key: 'is_default',
-                label: 'Modelo padrão',
-                type: 'select',
-                options: [
-                  { value: 'true', label: 'Sim' },
-                  { value: 'false', label: 'Não' },
-                ],
-              },
-              { key: 'content', label: 'Cláusulas e variáveis', type: 'textarea', required: true },
-            ]}
-            columns={[
-              { key: 'name', label: 'Modelo' },
-              { key: 'version', label: 'Versão' },
-              { key: 'is_default', label: 'Padrão' },
-              { key: 'updated_at', label: 'Atualizado em', format: 'datetime' },
-            ]}
-          />
-        )}
+        ) : <ContractTemplatesManager />}
       </div>
     </div>
   );
