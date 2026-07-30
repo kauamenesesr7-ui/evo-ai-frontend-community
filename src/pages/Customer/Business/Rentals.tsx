@@ -8,7 +8,7 @@ export default function Rentals() {
       title="Locações"
       subtitle="Agenda de eventos, reservas, clientes e valores em um só lugar."
       singular="Locação"
-      defaults={{ status: 'quote', total_amount: 0, paid_amount: 0 }}
+      defaults={{ status: 'quote', total_amount: 0, paid_amount: 0, metadata: { items: [] } }}
       fields={[
         { key: 'contact_id', label: 'Cliente', type: 'contact' },
         { key: 'title', label: 'Nome do evento', required: true },
@@ -17,6 +17,7 @@ export default function Rentals() {
         { key: 'ends_at', label: 'Término', type: 'datetime-local' },
         { key: 'venue', label: 'Local' },
         { key: 'guest_count', label: 'Convidados', type: 'number' },
+        { key: 'items', label: 'Itens da locação', type: 'products' },
         { key: 'total_amount', label: 'Valor total', type: 'number' },
         { key: 'paid_amount', label: 'Valor pago', type: 'number' },
         { key: 'status', label: 'Situação', type: 'select', options: [
@@ -28,7 +29,7 @@ export default function Rentals() {
       ]}
       columns={[
         { key: 'reference_code', label: 'Código' }, { key: 'title', label: 'Evento' },
-        { key: 'starts_at', label: 'Data', format: 'datetime' }, { key: 'venue', label: 'Local' },
+        { key: 'starts_at', label: 'Data', format: 'datetime' }, { key: 'metadata.items', label: 'Itens', format: 'items' },
         { key: 'total_amount', label: 'Valor', format: 'currency' }, { key: 'status', label: 'Situação', format: 'status' },
       ]}
     />

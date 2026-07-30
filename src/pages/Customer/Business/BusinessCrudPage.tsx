@@ -18,7 +18,7 @@ import {
   SelectValue,
   Textarea,
 } from '@evoapi/design-system';
-import { Check, Edit3, FileDown, Loader2, MessageCircle, Plus, Trash2 } from 'lucide-react';
+import { Check, Edit3, FileDown, Loader2, MessageCircle, PackagePlus, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { BaseHeader } from '@/components/base';
 import {
@@ -33,7 +33,7 @@ import { useAuthStore } from '@/store/authStore';
 export interface FieldConfig {
   key: string;
   label: string;
-  type?: 'text' | 'number' | 'date' | 'datetime-local' | 'textarea' | 'select' | 'contact';
+  type?: 'text' | 'number' | 'date' | 'datetime-local' | 'textarea' | 'select' | 'contact' | 'rental' | 'products';
   required?: boolean;
   options?: Array<{ value: string; label: string }>;
 }
@@ -41,7 +41,7 @@ export interface FieldConfig {
 interface ColumnConfig {
   key: string;
   label: string;
-  format?: 'currency' | 'date' | 'datetime' | 'status';
+  format?: 'currency' | 'date' | 'datetime' | 'status' | 'items';
 }
 
 interface Props {
@@ -59,6 +59,25 @@ interface ContactOption {
   id: string;
   name?: string;
   phone_number?: string;
+}
+
+interface RentalOption {
+  id: string;
+  reference_code?: string;
+  title?: string;
+}
+
+interface ProductOption {
+  id: string;
+  name: string;
+  default_price: number;
+}
+
+interface RentalItem {
+  product_id?: string;
+  name?: string;
+  unit_price: number;
+  quantity: number;
 }
 
 const statusLabels: Record<string, string> = {
@@ -100,8 +119,19 @@ const formatCell = (value: unknown, format?: ColumnConfig['format']) => {
         : { dateStyle: 'short' }).format(date);
   }
   if (format === 'status') return statusLabels[String(value)] || String(value);
+  if (format === 'items') {
+    const items = Array.isArray(value) ? value as RentalItem[] : [];
+    if (items.length === 0) return '—';
+    return items.map(item => `${item.quantity || 1}× ${item.name || 'Produto'}`).join(', ');
+  }
   return String(value);
 };
+
+const nestedValue = (record: BusinessRecord, path: string): unknown =>
+  path.split('.').reduce<unknown>((current, part) => {
+    if (!current || typeof current !== 'object') return undefined;
+    return (current as Record<string, unknown>)[part];
+  }, record);
 
 export default function BusinessCrudPage({
   resource,
@@ -115,6 +145,8 @@ export default function BusinessCrudPage({
 }: Props) {
   const [records, setRecords] = useState<BusinessRecord[]>([]);
   const [contacts, setContacts] = useState<ContactOption[]>([]);
+  const [rentals, setRentals] = useState<RentalOption[]>([]);
+  const [products, setProducts] = useState<ProductOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -145,6 +177,27 @@ export default function BusinessCrudPage({
         setContacts(Array.isArray(payload) ? payload : payload.data || []);
       })
       .catch(() => setContacts([]));
+  }, [fields]);
+
+  useEffect(() => {
+    if (!fields.some(field => field.type === 'rental')) return;
+    businessService.list('rentals')
+      .then(data => setRentals(data.map(record => ({
+        id: record.id,
+        reference_code: String(record.reference_code || ''),
+        title: String(record.title || ''),
+      }))))
+      .catch(() => setRentals([]));
+  }, [fields]);
+
+  useEffect(() => {
+    if (!fields.some(field => field.type === 'products')) return;
+    api.get('/products', { params: { page: 1, per_page: 500, status: 'active' } })
+      .then(response => {
+        const payload = extractData<ProductOption[] | { data?: ProductOption[] }>(response);
+        setProducts(Array.isArray(payload) ? payload : payload.data || []);
+      })
+      .catch(() => setProducts([]));
   }, [fields]);
 
   const openCreate = () => {
@@ -227,7 +280,7 @@ export default function BusinessCrudPage({
       )}
 
       {!loading && records.length > 0 && (
-        <div className="overflow-hidden rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-xl border bg-card">
           <div className="grid min-w-[850px] grid-cols-[repeat(var(--cols),minmax(140px,1fr))_180px] border-b bg-muted/40 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground" style={{ '--cols': columns.length } as React.CSSProperties}>
             {columns.map(column => <span key={column.key}>{column.label}</span>)}
             <span className="text-right">Ações</span>
@@ -237,8 +290,8 @@ export default function BusinessCrudPage({
               {columns.map(column => (
                 <span key={column.key} className="truncate pr-3">
                   {column.format === 'status'
-                    ? <Badge variant="secondary">{formatCell(record[column.key], column.format)}</Badge>
-                    : formatCell(record[column.key], column.format)}
+                    ? <Badge variant="secondary">{formatCell(nestedValue(record, column.key), column.format)}</Badge>
+                    : formatCell(nestedValue(record, column.key), column.format)}
                 </span>
               ))}
               <div className="flex justify-end gap-1">
@@ -277,14 +330,35 @@ export default function BusinessCrudPage({
                   <Label htmlFor={`${resource}-${field.key}`}>{field.label}</Label>
                   {field.type === 'textarea' ? (
                     <Textarea id={`${resource}-${field.key}`} rows={5} required={field.required} value={toInputValue(form[field.key], field.type)} onChange={event => setForm(current => ({ ...current, [field.key]: event.target.value }))} />
-                  ) : field.type === 'select' || field.type === 'contact' ? (
+                  ) : field.type === 'products' ? (
+                    <RentalItemsEditor
+                      items={((form.metadata as Record<string, unknown> | undefined)?.items as RentalItem[] | undefined) || []}
+                      products={products}
+                      onChange={items => {
+                        const total = items.reduce(
+                          (sum, item) => sum + Number(item.unit_price || 0) * Number(item.quantity || 0),
+                          0,
+                        );
+                        setForm(current => ({
+                          ...current,
+                          total_amount: total,
+                          metadata: {
+                            ...((current.metadata as Record<string, unknown> | undefined) || {}),
+                            items,
+                          },
+                        }));
+                      }}
+                    />
+                  ) : field.type === 'select' || field.type === 'contact' || field.type === 'rental' ? (
                     <Select value={toInputValue(form[field.key]) || '__none__'} onValueChange={value => setForm(current => ({ ...current, [field.key]: value === '__none__' ? null : value }))}>
                       <SelectTrigger id={`${resource}-${field.key}`}><SelectValue placeholder="Selecione" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="__none__">Nenhum</SelectItem>
                         {(field.type === 'contact'
                           ? contacts.map(contact => ({ value: contact.id, label: contact.name || contact.phone_number || 'Contato' }))
-                          : field.options || []).map(option => (
+                          : field.type === 'rental'
+                            ? rentals.map(rental => ({ value: rental.id, label: `${rental.reference_code} · ${rental.title}` }))
+                            : field.options || []).map(option => (
                             <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                           ))}
                       </SelectContent>
@@ -304,6 +378,99 @@ export default function BusinessCrudPage({
       </Dialog>
 
       <SignatureDialog target={signatureTarget} onClose={() => setSignatureTarget(null)} onSigned={load} />
+    </div>
+  );
+}
+
+function RentalItemsEditor({
+  items,
+  products,
+  onChange,
+}: {
+  items: RentalItem[];
+  products: ProductOption[];
+  onChange: (items: RentalItem[]) => void;
+}) {
+  const addProduct = (productId: string) => {
+    const product = products.find(candidate => candidate.id === productId);
+    if (!product) return;
+    const existingIndex = items.findIndex(item => item.product_id === productId);
+    if (existingIndex >= 0) {
+      onChange(items.map((item, index) => index === existingIndex
+        ? { ...item, quantity: Number(item.quantity || 0) + 1 }
+        : item));
+      return;
+    }
+    onChange([...items, {
+      product_id: product.id,
+      name: product.name,
+      unit_price: Number(product.default_price || 0),
+      quantity: 1,
+    }]);
+  };
+
+  const updateItem = (index: number, patch: Partial<RentalItem>) => {
+    onChange(items.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
+  };
+
+  return (
+    <div className="space-y-3 rounded-xl border bg-muted/20 p-3">
+      <Select value="" onValueChange={addProduct}>
+        <SelectTrigger>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <PackagePlus className="h-4 w-4" />
+            <SelectValue placeholder="Adicionar produto do catálogo" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          {products.map(product => (
+            <SelectItem key={product.id} value={product.id}>
+              {product.name} · {formatCell(product.default_price, 'currency')}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {items.length === 0 && (
+        <p className="py-2 text-center text-sm text-muted-foreground">Nenhum item adicionado.</p>
+      )}
+
+      {items.map((item, index) => (
+        <div key={`${item.product_id || item.name}-${index}`} className="grid grid-cols-[1fr_86px_120px_36px] items-end gap-2 rounded-lg bg-background p-2">
+          <div>
+            <Label className="text-xs">Produto</Label>
+            <p className="mt-2 truncate text-sm font-medium">{item.name || 'Produto'}</p>
+          </div>
+          <div>
+            <Label className="text-xs">Qtd.</Label>
+            <Input
+              type="number"
+              min={1}
+              value={item.quantity}
+              onChange={event => updateItem(index, { quantity: Math.max(1, Number(event.target.value)) })}
+            />
+          </div>
+          <div>
+            <Label className="text-xs">Valor unitário</Label>
+            <Input
+              type="number"
+              min={0}
+              step="0.01"
+              value={item.unit_price}
+              onChange={event => updateItem(index, { unit_price: Math.max(0, Number(event.target.value)) })}
+            />
+          </div>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            title="Remover item"
+            onClick={() => onChange(items.filter((_, itemIndex) => itemIndex !== index))}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
     </div>
   );
 }

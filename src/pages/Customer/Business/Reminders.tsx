@@ -11,6 +11,7 @@ export default function Reminders() {
       defaults={{ status: 'pending', delivery_channel: 'internal' }}
       fields={[
         { key: 'contact_id', label: 'Contato', type: 'contact' },
+        { key: 'rental_id', label: 'Locação relacionada', type: 'rental' },
         { key: 'title', label: 'Título', required: true },
         { key: 'remind_at', label: 'Data e horário', type: 'datetime-local', required: true },
         { key: 'delivery_channel', label: 'Entrega', type: 'select', options: [{ value: 'internal', label: 'Somente no CRM' }, { value: 'whatsapp', label: 'Enviar por WhatsApp' }] },

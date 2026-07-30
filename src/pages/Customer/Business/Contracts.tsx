@@ -11,6 +11,7 @@ export default function Contracts() {
       defaults={{ status: 'draft', issued_on: new Date().toISOString().slice(0, 10) }}
       fields={[
         { key: 'contact_id', label: 'Cliente', type: 'contact' },
+        { key: 'rental_id', label: 'Locação relacionada', type: 'rental' },
         { key: 'title', label: 'Título', required: true },
         { key: 'issued_on', label: 'Data de emissão', type: 'date', required: true },
         { key: 'company_signer_name', label: 'Responsável da empresa' },

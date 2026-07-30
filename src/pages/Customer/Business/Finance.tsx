@@ -11,6 +11,7 @@ export default function Finance() {
       defaults={{ kind: 'receivable', status: 'pending', due_on: new Date().toISOString().slice(0, 10) }}
       fields={[
         { key: 'contact_id', label: 'Contato', type: 'contact' },
+        { key: 'rental_id', label: 'Locação relacionada', type: 'rental' },
         { key: 'description', label: 'Descrição', required: true },
         { key: 'kind', label: 'Tipo', type: 'select', options: [{ value: 'receivable', label: 'A receber' }, { value: 'payable', label: 'A pagar' }] },
         { key: 'category', label: 'Categoria' },
