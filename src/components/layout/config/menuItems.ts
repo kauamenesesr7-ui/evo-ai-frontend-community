@@ -28,6 +28,11 @@ import {
   Route,
   ShieldCheck,
   FileText,
+  CalendarDays,
+  WalletCards,
+  BellRing,
+  FileSignature,
+  CreditCard,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -69,9 +74,34 @@ export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => 
     // landing page). Gating on it made `can()` deny for everyone (a key outside
     // the catalog is invalid), hiding the Dashboard from all users. No gate:
     // always visible to authenticated users (EVO-2071 AC7).
-    name: t('menu.customer.dashboard'),
+    name: 'Início',
     href: '/dashboard',
     icon: PieChart,
+  },
+  {
+    name: 'Locações',
+    href: '/rentals',
+    icon: CalendarDays,
+  },
+  {
+    name: 'Financeiro',
+    href: '/finance',
+    icon: WalletCards,
+  },
+  {
+    name: 'Lembretes',
+    href: '/reminders',
+    icon: BellRing,
+  },
+  {
+    name: 'Contratos',
+    href: '/contracts',
+    icon: FileSignature,
+  },
+  {
+    name: 'Assinatura',
+    href: '/subscription',
+    icon: CreditCard,
   },
   {
     name: t('menu.customer.conversations'),

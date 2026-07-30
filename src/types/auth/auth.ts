@@ -63,6 +63,7 @@ export interface PasswordChangeData {
 }
 
 export interface RegisterRequest {
+  company_name: string;
   email: string;
   password: string;
   password_confirmation: string;

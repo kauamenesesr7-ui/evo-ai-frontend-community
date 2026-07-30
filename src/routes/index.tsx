@@ -81,6 +81,7 @@ import HubSpotPage from '../pages/Customer/Settings/Integrations/HubSpotPage';
 import ShopifyPage from '../pages/Customer/Settings/Integrations/ShopifyPage';
 import LinearPage from '../pages/Customer/Settings/Integrations/LinearPage';
 import DashboardAppPage from '../pages/Customer/DashboardApp';
+import { Rentals, Finance, Reminders, Contracts, Subscription } from '@/pages/Customer/Business';
 
 // Páginas admin
 import AdminSettingsLayout from '@/pages/Admin/Settings';
@@ -413,6 +414,12 @@ const AppRouter = () => {
               </PrivateRoute>
             }
           />
+
+          <Route path="/rentals" element={<PrivateRoute><CustomerRoute><MainLayout><Rentals /></MainLayout></CustomerRoute></PrivateRoute>} />
+          <Route path="/finance" element={<PrivateRoute><CustomerRoute><MainLayout><Finance /></MainLayout></CustomerRoute></PrivateRoute>} />
+          <Route path="/reminders" element={<PrivateRoute><CustomerRoute><MainLayout><Reminders /></MainLayout></CustomerRoute></PrivateRoute>} />
+          <Route path="/contracts" element={<PrivateRoute><CustomerRoute><MainLayout><Contracts /></MainLayout></CustomerRoute></PrivateRoute>} />
+          <Route path="/subscription" element={<PrivateRoute><CustomerRoute><MainLayout><Subscription /></MainLayout></CustomerRoute></PrivateRoute>} />
 
           <Route
             path="/contacts/:contactId"

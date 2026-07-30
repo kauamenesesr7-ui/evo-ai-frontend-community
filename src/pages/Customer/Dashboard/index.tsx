@@ -15,6 +15,7 @@ import DashboardMetricsSection from './components/DashboardMetricsSection';
 import DashboardTrendsSection from './components/DashboardTrendsSection';
 import DashboardPerformanceSection from './components/DashboardPerformanceSection';
 import type { DashboardFilterState, DashboardOption } from './components/types';
+import BusinessOverviewSection from './components/BusinessOverviewSection';
 import { DashboardTour } from '@/tours';
 
 const ALL_FILTER_VALUE = '__all__';
@@ -274,7 +275,7 @@ const CustomerDashboardPage = () => {
       <DashboardTour />
       <div data-tour="dashboard-header">
         <BaseHeader
-          title={t('dashboard.title')}
+          title="Início"
           subtitle={t('dashboard.subtitle')}
           filters={appliedHeaderFilters}
           onFilterClick={handleOpenFilter}
@@ -289,6 +290,9 @@ const CustomerDashboardPage = () => {
         </Badge>
       </div>
 
+      <div data-tour="dashboard-metrics">
+        <BusinessOverviewSection />
+      </div>
       <div data-tour="dashboard-metrics">
         <DashboardMetricsSection data={data} t={t} />
       </div>

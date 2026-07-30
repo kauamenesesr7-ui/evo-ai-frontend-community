@@ -133,6 +133,10 @@ export const Auth: React.FC = () => {
   // Schema de validação para cadastro
   const registerSchema = z
     .object({
+      companyName: z
+        .string()
+        .min(1, { message: t('auth.errors.companyName.required') })
+        .min(2, { message: t('auth.errors.companyName.minLength') }),
       fullName: z
         .string()
         .min(1, { message: t('auth.errors.fullName.required') })
@@ -181,6 +185,7 @@ export const Auth: React.FC = () => {
   const registerForm = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      companyName: '',
       fullName: '',
       email: '',
       password: '',
@@ -271,6 +276,7 @@ export const Auth: React.FC = () => {
       const recaptchaToken = await executeRecaptcha('register');
 
       await register({
+        company_name: data.companyName,
         email: data.email,
         password: data.password,
         password_confirmation: data.confirmPassword,
@@ -533,6 +539,23 @@ export const Auth: React.FC = () => {
                   )}
 
                   <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="register-companyName">{t('auth.register.companyName')}</Label>
+                      <Input
+                        id="register-companyName"
+                        type="text"
+                        placeholder={t('auth.register.companyName')}
+                        autoComplete="organization"
+                        disabled={isLoading}
+                        {...registerForm.register('companyName')}
+                      />
+                      {registerForm.formState.errors.companyName && (
+                        <p className="text-destructive text-sm">
+                          {registerForm.formState.errors.companyName.message}
+                        </p>
+                      )}
+                    </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="register-fullName">{t('auth.register.fullName')}</Label>
                       <Input
