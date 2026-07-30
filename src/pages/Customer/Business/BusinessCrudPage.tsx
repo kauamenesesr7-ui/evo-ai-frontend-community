@@ -77,7 +77,9 @@ interface RentalItem {
   product_id?: string;
   name?: string;
   unit_price: number;
+  locked_unit_price?: number;
   quantity: number;
+  product?: ProductOption;
 }
 
 const statusLabels: Record<string, string> = {
@@ -122,7 +124,7 @@ const formatCell = (value: unknown, format?: ColumnConfig['format']) => {
   if (format === 'items') {
     const items = Array.isArray(value) ? value as RentalItem[] : [];
     if (items.length === 0) return '—';
-    return items.map(item => `${item.quantity || 1}× ${item.name || 'Produto'}`).join(', ');
+    return items.map(item => `${item.quantity || 1}× ${item.name || item.product?.name || 'Produto'}`).join(', ');
   }
   return String(value);
 };
@@ -208,7 +210,21 @@ export default function BusinessCrudPage({
 
   const openEdit = (record: BusinessRecord) => {
     setEditing(record);
-    setForm(record);
+    const relationalItems = Array.isArray(record.items)
+      ? (record.items as Array<Record<string, unknown>>).map(item => {
+          const product = item.product as ProductOption | undefined;
+          const unitPrice = Number(item.locked_unit_price || item.unit_price || product?.default_price || 0);
+          return {
+            product_id: String(item.product_id || product?.id || ''),
+            name: product?.name || String(item.name || ''),
+            unit_price: unitPrice,
+            locked_unit_price: unitPrice,
+            quantity: Number(item.quantity || 1),
+            product,
+          } satisfies RentalItem;
+        })
+      : [];
+    setForm({ ...record, items: relationalItems });
     setDialogOpen(true);
   };
 
@@ -332,7 +348,8 @@ export default function BusinessCrudPage({
                     <Textarea id={`${resource}-${field.key}`} rows={5} required={field.required} value={toInputValue(form[field.key], field.type)} onChange={event => setForm(current => ({ ...current, [field.key]: event.target.value }))} />
                   ) : field.type === 'products' ? (
                     <RentalItemsEditor
-                      items={((form.metadata as Record<string, unknown> | undefined)?.items as RentalItem[] | undefined) || []}
+                      items={(form.items as RentalItem[] | undefined) ||
+                        ((form.metadata as Record<string, unknown> | undefined)?.items as RentalItem[] | undefined) || []}
                       products={products}
                       onChange={items => {
                         const total = items.reduce(
@@ -342,6 +359,10 @@ export default function BusinessCrudPage({
                         setForm(current => ({
                           ...current,
                           total_amount: total,
+                          items: items.map(item => ({
+                            ...item,
+                            locked_unit_price: item.unit_price,
+                          })),
                           metadata: {
                             ...((current.metadata as Record<string, unknown> | undefined) || {}),
                             items,
@@ -405,6 +426,7 @@ function RentalItemsEditor({
       product_id: product.id,
       name: product.name,
       unit_price: Number(product.default_price || 0),
+      locked_unit_price: Number(product.default_price || 0),
       quantity: 1,
     }]);
   };
@@ -457,7 +479,10 @@ function RentalItemsEditor({
               min={0}
               step="0.01"
               value={item.unit_price}
-              onChange={event => updateItem(index, { unit_price: Math.max(0, Number(event.target.value)) })}
+              onChange={event => {
+                const value = Math.max(0, Number(event.target.value));
+                updateItem(index, { unit_price: value, locked_unit_price: value });
+              }}
             />
           </div>
           <Button

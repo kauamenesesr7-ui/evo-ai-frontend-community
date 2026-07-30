@@ -7,8 +7,8 @@ import { toFieldErrors } from './productErrors';
 import type {
   Product,
   ProductFormData,
-  ProductKind,
   ProductStatus,
+  RentalCategory,
 } from '@/types/products';
 import ProductsHeader from '@/components/products/ProductsHeader';
 import ProductsTable from '@/components/products/ProductsTable';
@@ -40,7 +40,7 @@ export default function Products() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [search, setSearch] = useState('');
-  const [kindFilter, setKindFilter] = useState<ProductKind | 'all'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<RentalCategory | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<ProductStatus | 'all'>('all');
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -53,10 +53,10 @@ export default function Products() {
   const params = useMemo(() => {
     const out: Record<string, unknown> = { page, per_page: DEFAULT_PAGE_SIZE };
     if (search.trim()) out.q = search.trim();
-    if (kindFilter !== 'all') out.kind = kindFilter;
+    if (categoryFilter !== 'all') out.rental_category = categoryFilter;
     if (statusFilter !== 'all') out.status = statusFilter;
     return out;
-  }, [page, search, kindFilter, statusFilter]);
+  }, [page, search, categoryFilter, statusFilter]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -142,15 +142,15 @@ export default function Products() {
 
       <ProductsHeader
         search={search}
-        kindFilter={kindFilter}
+        categoryFilter={categoryFilter}
         statusFilter={statusFilter}
         canCreate={canCreate}
         onSearchChange={(v) => {
           setSearch(v);
           setPage(1);
         }}
-        onKindChange={(v) => {
-          setKindFilter(v);
+        onCategoryChange={(v) => {
+          setCategoryFilter(v);
           setPage(1);
         }}
         onStatusChange={(v) => {

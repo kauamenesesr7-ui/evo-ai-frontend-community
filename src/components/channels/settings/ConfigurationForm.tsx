@@ -511,7 +511,7 @@ const EvolutionWhatsAppConfig: React.FC<{
   const [instanceSettings, setInstanceSettings] = useState({
     rejectCall: true,
     msgCall: 'Não aceito chamadas',
-    groupsIgnore: false,
+    groupsIgnore: true,
     alwaysOnline: true,
     readMessages: false,
     syncFullHistory: false,

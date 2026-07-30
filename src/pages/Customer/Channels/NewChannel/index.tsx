@@ -182,18 +182,16 @@ export default function NewChannel({ initialChannelId, onExit }: NewChannelProps
   };
 
   const handleChannelSelectWithValidation = (channel: ChannelType) => {
-    // Check if Facebook configuration is available
-    if (channel.type === 'facebook' && !canFB) {
-      return toast.error(t('newChannel.messages.facebookConfigMissing'));
-    }
-    // Check if Instagram configuration is available
-    if (channel.type === 'instagram' && !canIG) {
-      return toast.error(t('newChannel.messages.instagramConfigMissing'));
+    if (channel.type !== 'whatsapp') {
+      return toast.info('EM DESENVOLVIMENTO');
     }
     handleChannelSelect(channel);
   };
 
   const handleProviderSelectWithValidation = (provider: ProviderType) => {
+    if (selectedChannel?.type === 'whatsapp' && provider.id !== 'evolution') {
+      return toast.info('EM DESENVOLVIMENTO');
+    }
     // Defense in depth: Twilio is "coming soon" and rendered disabled in the
     // picker; ignore any select that slips through (WhatsApp and SMS).
     if (provider.id === 'twilio') return;

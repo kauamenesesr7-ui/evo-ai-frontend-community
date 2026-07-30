@@ -26,37 +26,11 @@ export const getChannelTypes = (): ChannelType[] => [
     type: 'whatsapp',
     providers: [
       {
-        id: 'whatsapp_cloud',
-        name: i18n.t('channels:newChannel.providers.whatsappCloud.name'),
-        description: i18n.t('channels:newChannel.providers.whatsappCloud.description'),
-        recommended: true,
-      },
-      {
         id: 'evolution',
         name: i18n.t('channels:newChannel.providers.evolution.name'),
         description: i18n.t('channels:newChannel.providers.evolution.description'),
-        popular: false,
-      },
-      {
-        id: 'evolution_go',
-        name: i18n.t('channels:newChannel.providers.evolutionGo.name'),
-        description: i18n.t('channels:newChannel.providers.evolutionGo.description'),
+        recommended: true,
         popular: true,
-      },
-      {
-        id: 'notificame',
-        name: i18n.t('channels:newChannel.providers.notificame.name'),
-        description: i18n.t('channels:newChannel.providers.notificame.description'),
-      },
-      {
-        id: 'zapi',
-        name: i18n.t('channels:newChannel.providers.zapi.name'),
-        description: i18n.t('channels:newChannel.providers.zapi.description'),
-      },
-      {
-        id: 'twilio',
-        name: i18n.t('channels:newChannel.providers.twilio.name'),
-        description: i18n.t('channels:newChannel.providers.twilio.description'),
       },
     ],
   },

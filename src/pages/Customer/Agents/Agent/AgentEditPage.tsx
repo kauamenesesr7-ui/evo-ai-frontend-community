@@ -5,7 +5,6 @@ import { useLanguage } from '@/hooks/useLanguage';
 import {
   getAgent,
   updateAgent,
-  listApiKeys,
   getAccessibleAgents,
   getAgentIntegrations,
 } from '@/services/agents';
@@ -16,7 +15,6 @@ import { LLMConfigData } from '@/components/ai_agents/Forms/LLMConfigForm';
 import { A2AConfigData } from '@/components/ai_agents/Forms/A2AConfigForm';
 import { TaskConfigData } from '@/components/ai_agents/Forms/TaskConfigForm';
 import SubAgentsForm, { SubAgentsData } from '@/components/ai_agents/Forms/SubAgentsForm';
-import { ApiKey } from '@/types/agents';
 import integrationService from '@/services/agents/integrationService';
 import { CustomTool } from '@/types/ai';
 import { MCPServerConfig } from '@/types/ai';
@@ -97,7 +95,6 @@ const AgentEditPage = () => {
     };
   } | null>(null);
   const [subAgentsData, setSubAgentsData] = useState<SubAgentsData>({ sub_agents: [] });
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
 
   // Estados de configurações avançadas (aplicáveis a todos os tipos)
   const [outputSchema, setOutputSchema] = useState<
@@ -243,20 +240,6 @@ const AgentEditPage = () => {
       }
     }
   }, [agent?.type, activeMenu]);
-
-  // Carregar API Keys
-  const loadApiKeys = useCallback(async () => {
-    try {
-      const apiKeysData = await listApiKeys();
-      setApiKeys(apiKeysData);
-    } catch (error) {
-      console.error('Error loading API keys:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadApiKeys();
-  }, [loadApiKeys]);
 
   // Carregar Pipelines
   const loadPipelines = useCallback(async () => {
@@ -858,7 +841,7 @@ const AgentEditPage = () => {
             a2aConfigData={a2aConfigData}
             taskConfigData={taskConfigData}
             externalConfigData={externalConfigData}
-            apiKeys={apiKeys}
+            apiKeys={[]}
             outputSchema={outputSchema}
             advancedSettings={advancedSettings}
             behaviorSettings={behaviorSettings}
@@ -920,7 +903,7 @@ const AgentEditPage = () => {
             onInstructionSync={instruction => {
               setFormData(prev => ({ ...prev, instruction }));
             }}
-            onApiKeysReload={loadApiKeys}
+            onApiKeysReload={async () => {}}
           />
         );
 

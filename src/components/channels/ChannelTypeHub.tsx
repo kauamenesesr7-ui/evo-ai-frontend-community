@@ -6,7 +6,6 @@ import { getChannelTypes } from '@/constants/channelTypes';
 import { buildChannelTypeStatuses, ChannelTypeStatus } from '@/utils/channelStatus';
 import useLiveChannelStatus from '@/hooks/channels/useLiveChannelStatus';
 import ChannelTypeCard from './ChannelTypeCard';
-import { useGlobalConfig } from '@/contexts/GlobalConfigContext';
 
 interface ChannelTypeHubProps {
   inboxes: Inbox[];
@@ -25,16 +24,6 @@ export default function ChannelTypeHub({
 }: ChannelTypeHubProps) {
   const { t, currentLanguage } = useLanguage('channels');
   const { states: liveStates, loadingIds, failedIds } = useLiveChannelStatus(inboxes);
-  const config = useGlobalConfig();
-
-  // Email can only be connected once an OAuth integration (Gmail or Outlook) is set
-  // up. If neither is, the email card mirrors the disabled provider grid: its action
-  // is disabled with an explanatory tooltip instead of leading to a dead-end screen
-  // where every provider is greyed out.
-  const emailIntegrationConfigured =
-    (typeof config.googleOAuthClientId === 'string' && config.googleOAuthClientId.length > 0) ||
-    (typeof config.azureAppId === 'string' && config.azureAppId.length > 0);
-
   // getChannelTypes() reads translated labels, so recompute when language changes.
   const typeStatuses = useMemo(
     () => buildChannelTypeStatuses(getChannelTypes(), inboxes, liveStates),
@@ -74,8 +63,8 @@ export default function ChannelTypeHub({
             liveLoadingIds={loadingIds}
             liveFailedIds={failedIds}
             disabledReason={
-              typeStatus.type.type === 'email' && !emailIntegrationConfigured
-                ? t('overview.noIntegrationConfigured')
+              typeStatus.type.type !== 'whatsapp'
+                ? 'EM DESENVOLVIMENTO'
                 : undefined
             }
           />

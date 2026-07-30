@@ -1,7 +1,5 @@
 import type { CSSProperties } from 'react';
-import { useDarkMode } from '../hooks/useDarkMode';
-import logoDark from '../assets/EVO_CRM.svg';
-import logoLight from '../assets/EVO_CRM_light.svg';
+import { cn } from '@/utils/cn';
 
 interface AppLogoProps {
   className?: string;
@@ -10,10 +8,19 @@ interface AppLogoProps {
   forceTheme?: 'dark' | 'light';
 }
 
-export function AppLogo({ className, alt = 'EVO CRM', style, forceTheme }: AppLogoProps) {
-  const { theme } = useDarkMode();
-  const effectiveTheme = forceTheme ?? theme;
-  const src = effectiveTheme === 'dark' ? logoDark : logoLight;
-
-  return <img src={src} alt={alt} className={className} style={style} />;
+export function AppLogo({ className, alt = 'AppEventos', style }: AppLogoProps) {
+  return (
+    <span
+      role="img"
+      aria-label={alt}
+      className={cn(
+        'inline-flex items-center rounded-lg bg-[#111827] px-3 py-1.5 font-bold tracking-tight shadow-sm',
+        className,
+      )}
+      style={style}
+    >
+      <span className="text-white">App</span>
+      <span className="text-[#8B5CF6]">Eventos</span>
+    </span>
+  );
 }

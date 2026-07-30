@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Dialog, DialogContent } from '@evoapi/design-system';
 import { X } from 'lucide-react';
-import { createAgent, listApiKeys } from '@/services/agents';
+import { createAgent } from '@/services/agents';
 import integrationService from '@/services/agents/integrationService';
-import { ApiKey, AgentCreate } from '@/types/agents';
+import { AgentCreate } from '@/types/agents';
 import { toast } from 'sonner';
 import { extractBackendErrorMessage } from '@/utils/agentUtils';
 
@@ -16,7 +16,6 @@ import WizardStep3_SubAgents from '@/pages/Customer/Agents/Agent/wizard/WizardSt
 import WizardStep3_TaskConfig from '@/pages/Customer/Agents/Agent/wizard/WizardStep3_TaskConfig';
 import Step4_RoleGoal from '@/pages/Customer/Agents/Agent/wizard/Step4_RoleGoal';
 import Step5_Instructions from '@/pages/Customer/Agents/Agent/wizard/Step5_Instructions';
-import Step6_ApiKeyModel from '@/pages/Customer/Agents/Agent/wizard/Step6_ApiKeyModel';
 import WizardStep4_Success from '@/pages/Customer/Agents/Agent/wizard/WizardStep4_Success';
 import { ProviderSelector } from '@/components/agents/ProviderSelector';
 import ExternalAgentConfig, { ExternalAgentConfigData } from '@/components/agents/ExternalAgentConfig';
@@ -67,9 +66,6 @@ const AgentWizardModal = ({ open, onOpenChange, onAgentCreated, embedded = false
   const [createdAgentId, setCreatedAgentId] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  // API Keys
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-
   // Wizard data
   const [wizardData, setWizardData] = useState<WizardData>({
     name: '',
@@ -112,22 +108,6 @@ const AgentWizardModal = ({ open, onOpenChange, onAgentCreated, embedded = false
     }
   }, [open]);
 
-  // Carregar API Keys
-  const loadApiKeys = useCallback(async () => {
-    try {
-      const apiKeysData = await listApiKeys();
-      setApiKeys(apiKeysData);
-    } catch (error) {
-      console.error(t('messages.apiKeysError'), error);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    if (open) {
-      loadApiKeys();
-    }
-  }, [open, loadApiKeys]);
-
   useEffect(() => {
     if (open && contentRef.current) {
       contentRef.current.scrollTop = 0;
@@ -148,8 +128,7 @@ const AgentWizardModal = ({ open, onOpenChange, onAgentCreated, embedded = false
       steps.push(
         { id: 3, label: t('wizard.progress.role') },
         { id: 4, label: t('wizard.progress.instructions') },
-        { id: 5, label: t('wizard.progress.model') },
-        { id: 6, label: t('wizard.progress.completed') }
+        { id: 5, label: t('wizard.progress.completed') }
       );
     } else if (wizardData.type === 'task') {
       // Fluxo Task: Nome → Tipo → Task Config → Sucesso
@@ -286,8 +265,6 @@ const AgentWizardModal = ({ open, onOpenChange, onAgentCreated, embedded = false
       // Configuração específica para LLM
       if (wizardData.type === 'llm') {
         Object.assign(agentData, {
-          model: wizardData.model,
-          api_key_id: wizardData.api_key_id,
           instruction: wizardData.instruction,
           role: wizardData.role || '',
           goal: wizardData.goal || '',
@@ -626,25 +603,7 @@ const AgentWizardModal = ({ open, onOpenChange, onAgentCreated, embedded = false
       }
     }
 
-    // Step 5: Para LLM - API Key e Model
-    if (currentStep === 5 && wizardData.type === 'llm') {
-      return (
-        <Step6_ApiKeyModel
-          data={{
-            api_key_id: wizardData.api_key_id,
-            model: wizardData.model,
-          }}
-          onChange={(data) => setWizardData({ ...wizardData, ...data })}
-          onNext={handleNext}
-          onBack={handleBack}
-          apiKeys={apiKeys}
-          onApiKeysReload={loadApiKeys}
-        />
-      );
-    }
-
-    // Step 5: Para External - Sucesso
-    if (currentStep === 5 && wizardData.type === 'external' && createdAgentId) {
+    if (currentStep === 5 && wizardData.type === 'llm' && createdAgentId) {
       return (
         <WizardStep4_Success
           agentId={createdAgentId}
@@ -654,8 +613,8 @@ const AgentWizardModal = ({ open, onOpenChange, onAgentCreated, embedded = false
       );
     }
 
-    // Step 6: Para LLM - Sucesso
-    if (currentStep === 6 && wizardData.type === 'llm' && createdAgentId) {
+    // Step 5: Para External - Sucesso
+    if (currentStep === 5 && wizardData.type === 'external' && createdAgentId) {
       return (
         <WizardStep4_Success
           agentId={createdAgentId}

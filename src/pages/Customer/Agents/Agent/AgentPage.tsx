@@ -15,10 +15,9 @@ import {
   getAgent,
   updateAgent,
   createAgent,
-  listApiKeys,
   getAccessibleAgents,
 } from '@/services/agents';
-import { ApiKey, AgentCreate, Agent } from '@/types/agents';
+import { AgentCreate, Agent } from '@/types/agents';
 import { CustomTool } from '@/types/ai';
 import { extractBackendErrorMessage } from '@/utils/agentUtils';
 import { toast } from 'sonner';
@@ -120,23 +119,6 @@ const AgentPage = () => {
     knowledge_tags: [],
     output_schema: {},
   });
-
-  // Estados para integração com backend
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-
-  // Carregar API Keys
-  const loadApiKeys = useCallback(async () => {
-    try {
-      const apiKeysData = await listApiKeys();
-      setApiKeys(apiKeysData);
-    } catch (error) {
-      console.error(t('messages.apiKeysError'), error);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    loadApiKeys();
-  }, [loadApiKeys]);
 
   // Função auxiliar para carregar dados completos dos agentes pelos IDs
   const loadAgentToolsData = useCallback(async (agentIds: string[]) => {
@@ -584,8 +566,8 @@ const AgentPage = () => {
             toolsConfigData={toolsConfigData}
             onToolsConfigChange={handleToolsConfigChange}
             onValidationChange={handleValidationChange}
-            apiKeys={apiKeys}
-            onApiKeysReload={loadApiKeys}
+            apiKeys={[]}
+            onApiKeysReload={async () => {}}
             clientId="default"
             editingAgentId={id}
             folderId={undefined}

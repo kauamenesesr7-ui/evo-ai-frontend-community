@@ -6,6 +6,7 @@ import CustomerRoute from './CustomerRoute';
 import SmartRedirect from './SmartRedirect';
 import RouterGuard from '@/guards/RouterGuard';
 import PermissionRoute from './PermissionRoute';
+import AdminRoute from './AdminRoute';
 import { PluginRoutes, type PluginRoute as PluginRouteType } from '@/plugin-host';
 
 import MainLayout from '@/components/layout/MainLayout';
@@ -63,18 +64,14 @@ import NewCampaign from '@/pages/Customer/Campaigns/NewCampaign/NewCampaign';
 import CannedResponses from '@/pages/Customer/Settings/CannedResponses';
 import MessageTemplates from '@/pages/Customer/Settings/MessageTemplates';
 import { Macros } from '@/pages/Customer/Settings/Macros';
-import Products, { ProductsImport } from '@/pages/Customer/Settings/Products';
-import CrmForms from '@/pages/Customer/Settings/CrmForms';
-import ChatPages from '@/pages/Customer/Settings/ChatPages';
+import Products from '@/pages/Customer/Settings/Products';
 import Templates from '@/pages/Customer/Settings/Templates/Templates';
 import { Integrations } from '@/pages/Customer/Settings/Integrations';
 import EmailTemplateEditor from '@/pages/Customer/Settings/EmailTemplateEditor';
 import WebhooksPage from '../pages/Customer/Settings/Integrations/WebhooksPage';
 import OAuthAppsPage from '../pages/Customer/Settings/Integrations/OAuthAppsPage';
 import DashboardAppsPage from '../pages/Customer/Settings/Integrations/DashboardAppsPage';
-import AccessTokens from '../pages/Customer/Settings/AccessTokens/AccessTokens';
 import SlackIntegrationPage from '../pages/Customer/Settings/Integrations/SlackIntegrationPage';
-import OpenAIPage from '../pages/Customer/Settings/Integrations/OpenAIPage';
 import BMSPage from '../pages/Customer/Settings/Integrations/BMSPage';
 import LeadSquaredPage from '../pages/Customer/Settings/Integrations/LeadSquaredPage';
 import HubSpotPage from '../pages/Customer/Settings/Integrations/HubSpotPage';
@@ -82,9 +79,9 @@ import ShopifyPage from '../pages/Customer/Settings/Integrations/ShopifyPage';
 import LinearPage from '../pages/Customer/Settings/Integrations/LinearPage';
 import DashboardAppPage from '../pages/Customer/DashboardApp';
 import { Rentals, Finance, Reminders, Contracts, Subscription } from '@/pages/Customer/Business';
+import AppEventosAdmin from '@/pages/Admin/AppEventosAdmin';
 
 // Páginas admin
-import AdminSettingsLayout from '@/pages/Admin/Settings';
 const RolesList = React.lazy(() => import('@/pages/Admin/Roles/RolesList'));
 const RoleDetail = React.lazy(() => import('@/pages/Admin/Roles/RoleDetail'));
 const SmtpConfig = React.lazy(() => import('@/pages/Admin/Settings/SmtpConfig'));
@@ -769,7 +766,7 @@ const AppRouter = () => {
           />
 
           <Route
-            path="/settings/canned-responses"
+            path="/quick-replies"
             element={
               <PrivateRoute>
                 <CustomerRoute>
@@ -781,6 +778,10 @@ const AppRouter = () => {
                 </CustomerRoute>
               </PrivateRoute>
             }
+          />
+          <Route
+            path="/settings/canned-responses"
+            element={<Navigate to="/quick-replies" replace />}
           />
 
           <Route
@@ -815,47 +816,17 @@ const AppRouter = () => {
 
           <Route
             path="/settings/crm-forms"
-            element={
-              <PrivateRoute>
-                <CustomerRoute>
-                  <MainLayout>
-                    <PermissionRoute resource="crm_forms" action="read">
-                      <CrmForms />
-                    </PermissionRoute>
-                  </MainLayout>
-                </CustomerRoute>
-              </PrivateRoute>
-            }
+            element={<Navigate to="/dashboard" replace />}
           />
 
           <Route
             path="/settings/chat-pages"
-            element={
-              <PrivateRoute>
-                <CustomerRoute>
-                  <MainLayout>
-                    <PermissionRoute resource="chat_pages" action="read">
-                      <ChatPages />
-                    </PermissionRoute>
-                  </MainLayout>
-                </CustomerRoute>
-              </PrivateRoute>
-            }
+            element={<Navigate to="/dashboard" replace />}
           />
 
           <Route
             path="/products/import"
-            element={
-              <PrivateRoute>
-                <CustomerRoute>
-                  <MainLayout>
-                    <PermissionRoute resource="products" action="create">
-                      <ProductsImport />
-                    </PermissionRoute>
-                  </MainLayout>
-                </CustomerRoute>
-              </PrivateRoute>
-            }
+            element={<Navigate to="/products" replace />}
           />
 
           <Route
@@ -975,17 +946,7 @@ const AppRouter = () => {
           />
           <Route
             path="/settings/integrations/openai"
-            element={
-              <PrivateRoute>
-                <CustomerRoute>
-                  <MainLayout>
-                    <PermissionRoute resource="integrations" action="read">
-                      <OpenAIPage />
-                    </PermissionRoute>
-                  </MainLayout>
-                </CustomerRoute>
-              </PrivateRoute>
-            }
+            element={<Navigate to="/settings/integrations" replace />}
           />
           <Route
             path="/settings/integrations/bms"
@@ -1076,17 +1037,7 @@ const AppRouter = () => {
 
           <Route
             path="/settings/access-tokens"
-            element={
-              <PrivateRoute>
-                <CustomerRoute>
-                  <MainLayout>
-                    <PermissionRoute resource="access_tokens" action="read">
-                      <AccessTokens />
-                    </PermissionRoute>
-                  </MainLayout>
-                </CustomerRoute>
-              </PrivateRoute>
-            }
+            element={<Navigate to="/dashboard" replace />}
           />
 
           <Route
@@ -1429,20 +1380,23 @@ const AppRouter = () => {
             }
           />
 
-          {/* Admin Settings Routes */}
           <Route
-            path="/settings/admin"
+            path="/admin"
             element={
               <PrivateRoute>
-                <CustomerRoute>
+                <AdminRoute>
                   <MainLayout>
-                    <PermissionRoute resource="installation_configs" action="manage">
-                      <AdminSettingsLayout />
-                    </PermissionRoute>
+                    <AppEventosAdmin />
                   </MainLayout>
-                </CustomerRoute>
+                </AdminRoute>
               </PrivateRoute>
             }
+          />
+
+          {/* Configurações técnicas pertencem exclusivamente ao superadmin. */}
+          <Route
+            path="/settings/admin"
+            element={<Navigate to="/admin" replace />}
           >
             <Route
               path="email"

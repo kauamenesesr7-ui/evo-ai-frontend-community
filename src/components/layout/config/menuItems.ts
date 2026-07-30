@@ -1,4 +1,4 @@
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import {
   User,
   LogOut,
@@ -14,10 +14,7 @@ import {
   Code,
   MessageCircle,
   LayoutTemplate,
-  Key,
   Tags,
-  TestTube,
-  Wand,
   Workflow,
   Settings,
   List,
@@ -27,7 +24,6 @@ import {
   Megaphone,
   Route,
   ShieldCheck,
-  FileText,
   CalendarDays,
   WalletCards,
   BellRing,
@@ -67,66 +63,44 @@ export interface ProfileMenuItem {
   onClick?: () => void;
 }
 
-export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => [
+export const getCustomerMenuItems = (_t: (key: string) => string): MenuItem[] => [
+  { name: 'Início', href: '/dashboard', icon: PieChart },
   {
-    // `dashboard.read` is not a catalog resource — it lives in the auth
-    // BASIC_READ_PERMISSIONS (every authenticated user holds it, it is the
-    // landing page). Gating on it made `can()` deny for everyone (a key outside
-    // the catalog is invalid), hiding the Dashboard from all users. No gate:
-    // always visible to authenticated users (EVO-2071 AC7).
-    name: 'Início',
-    href: '/dashboard',
-    icon: PieChart,
-  },
-  {
-    name: 'Locações',
-    href: '/rentals',
-    icon: CalendarDays,
-  },
-  {
-    name: 'Financeiro',
-    href: '/finance',
-    icon: WalletCards,
-  },
-  {
-    name: 'Lembretes',
-    href: '/reminders',
-    icon: BellRing,
-  },
-  {
-    name: 'Contratos',
-    href: '/contracts',
-    icon: FileSignature,
-  },
-  {
-    name: 'Assinatura',
-    href: '/subscription',
-    icon: CreditCard,
-  },
-  {
-    name: t('menu.customer.conversations'),
+    name: 'Conversas',
     href: '/conversations',
     icon: MessageSquare,
     resource: 'conversations',
     action: 'read',
   },
   {
+    name: 'Pipelines',
+    href: '/pipelines',
+    icon: SquareKanban,
+    resource: 'pipelines',
+    action: 'read',
+  },
+  { name: 'Contratos', href: '/contracts', icon: FileSignature },
+  { name: 'Locações', href: '/rentals', icon: CalendarDays },
+  {
+    name: 'Produtos',
+    href: '/products',
+    icon: Package,
+    resource: 'products',
+    action: 'read',
+  },
+  { name: 'Financeiro', href: '/finance', icon: WalletCards },
+  { name: 'Lembretes', href: '/reminders', icon: BellRing },
+  {
     id: 'customer-contacts',
-    name: t('menu.customer.contacts'),
+    name: 'Contatos',
     href: '/contacts',
     icon: Contact,
     resource: 'contacts',
     action: 'read',
     subItems: [
+      { name: 'Lista de contatos', href: '/contacts', icon: Contact, resource: 'contacts', action: 'read' },
       {
-        name: t('menu.contacts.list'),
-        href: '/contacts',
-        icon: Contact,
-        resource: 'contacts',
-        action: 'read',
-      },
-      {
-        name: t('menu.contacts.scheduledActions'),
+        name: 'Ações agendadas',
         href: '/contacts/scheduled-actions',
         icon: Clock,
         resource: 'contacts',
@@ -135,287 +109,163 @@ export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => 
     ],
   },
   {
-    name: t('menu.customer.pipelines'),
-    href: '/pipelines',
-    icon: SquareKanban,
-    resource: 'pipelines',
+    name: 'Respostas rápidas',
+    href: '/quick-replies',
+    icon: MessageCircle,
+    resource: 'canned_responses',
     action: 'read',
   },
   {
-    name: t('menu.customer.products'),
-    href: '/products',
-    icon: Package,
-    resource: 'products',
-    action: 'read',
-  },
-  {
-    name: t('menu.customer.automation'),
-    href: '/automation',
-    icon: Workflow,
-    resource: 'automation_rules',
-    action: 'read',
-  },
-  {
-    name: t('menu.customer.journeys'),
-    href: '/journeys',
-    icon: Route,
-    resource: 'journeys',
-    action: 'read',
-  },
-  {
-    name: t('menu.customer.campaigns'),
+    name: 'Campanhas',
     href: '/campaigns',
     icon: Megaphone,
     resource: 'campaigns',
     action: 'read',
   },
   {
+    name: 'Automações',
+    href: '/automation',
+    icon: Workflow,
+    resource: 'automation_rules',
+    action: 'read',
+  },
+  {
+    name: 'Jornadas',
+    href: '/journeys',
+    icon: Route,
+    resource: 'journeys',
+    action: 'read',
+  },
+  {
     id: 'customer-agents',
-    name: t('menu.customer.agents'),
+    name: 'Agentes IA',
     href: '/agents/list',
     icon: Bot,
     resource: 'ai_agents',
     action: 'read',
     subItems: [
-      {
-        name: t('menu.agents.list'),
-        href: '/agents/list',
-        icon: List,
-        resource: 'ai_agents',
-        action: 'read',
-      },
-      {
-        name: t('menu.agents.customTools'),
-        href: '/agents/custom-tools',
-        icon: Wand,
-        resource: 'ai_custom_tools',
-        action: 'read',
-      },
-      {
-        name: t('menu.agents.customMcps'),
-        href: '/agents/custom-mcp-servers',
-        icon: TestTube,
-        resource: 'ai_custom_mcp_servers',
-        action: 'read',
-      },
+      { name: 'Meus agentes', href: '/agents/list', icon: List, resource: 'ai_agents', action: 'read' },
     ],
   },
   {
-    name: t('menu.customer.channels'),
+    name: 'Canais',
     href: '/channels',
     icon: Layers,
     resource: 'inboxes',
     action: 'read',
   },
   {
+    name: 'Administração SaaS',
+    href: '/admin',
+    icon: Shield,
+    requiredRoleKey: 'super_admin',
+  },
+  { name: 'Assinatura', href: '/subscription', icon: CreditCard },
+  {
     id: 'customer-settings',
-    name: t('menu.customer.settings'),
+    name: 'Configurações',
     href: '#',
     icon: Cog,
     subItems: [
+      { name: 'Conta', href: '/settings/account', icon: User, resource: 'accounts', action: 'read' },
+      { name: 'Usuários', href: '/settings/users', icon: Users2, resource: 'users', action: 'manage' },
+      { name: 'Equipes', href: '/settings/teams', icon: Clock, resource: 'teams', action: 'read' },
+      { name: 'Etiquetas', href: '/settings/labels', icon: Tags, resource: 'labels', action: 'read' },
       {
-        name: t('menu.settings.account'),
-        href: '/settings/account',
-        icon: User,
-        // Mirrors the /settings/account route gate; accounts.read is a basic
-        // grant every role holds, so the item stays visible — but menu and
-        // route now agree instead of the menu linking into Não Autorizado.
-        resource: 'accounts',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.users'),
-        href: '/settings/users',
-        icon: Users2,
-        resource: 'users',
-        // EVO-1938: gate the Users (Atendentes) screen on the administrative
-        // users.manage. The earlier revert to users.read predated users.manage
-        // being registered in the auth ResourceActionsConfig; it now is, so the
-        // manage gate resolves for admins (who hold it) and hides the screen from
-        // the default agent (who holds only the operational users.read).
-        action: 'manage',
-      },
-      {
-        name: t('menu.settings.teams'),
-        href: '/settings/teams',
-        icon: Clock,
-        resource: 'teams',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.labels'),
-        href: '/settings/labels',
-        icon: Tags,
-        resource: 'labels',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.customAttributes'),
+        name: 'Atributos',
         href: '/settings/attributes',
         icon: Code,
         resource: 'custom_attribute_definitions',
         action: 'read',
       },
+      { name: 'Segmentos', href: '/settings/segments', icon: Filter, resource: 'segments', action: 'read' },
       {
-        name: t('menu.settings.segments'),
-        href: '/settings/segments',
-        icon: Filter,
-        resource: 'segments',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.cannedResponses'),
-        href: '/settings/canned-responses',
-        icon: MessageCircle,
-        resource: 'canned_responses',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.messageTemplates'),
+        name: 'Modelos de mensagem',
         href: '/settings/message-templates',
         icon: LayoutTemplate,
         resource: 'message_templates',
         action: 'read',
       },
+      { name: 'Macros', href: '/settings/macros', icon: Settings, resource: 'macros', action: 'read' },
       {
-        name: t('menu.settings.macros'),
-        href: '/settings/macros',
-        icon: Settings,
-        resource: 'macros',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.crmForms'),
-        href: '/settings/crm-forms',
-        icon: FileText,
-        resource: 'crm_forms',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.chatPages'),
-        href: '/settings/chat-pages',
-        icon: MessageSquare,
-        resource: 'chat_pages',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.templates'),
-        href: '/settings/templates',
-        icon: Package,
-        resource: 'templates',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.integrations'),
+        name: 'Integrações autorizadas',
         href: '/settings/integrations',
         icon: Settings,
         resource: 'integrations',
         action: 'read',
       },
-      {
-        name: t('menu.settings.accessTokens'),
-        href: '/settings/access-tokens',
-        icon: Key,
-        resource: 'access_tokens',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.roles'),
-        href: '/settings/roles',
-        icon: ShieldCheck,
-        resource: 'roles',
-        action: 'read',
-      },
-      {
-        name: t('menu.settings.admin'),
-        href: '/settings/admin',
-        icon: Shield,
-        resource: 'installation_configs',
-        action: 'manage',
-      },
+      { name: 'Papéis e permissões', href: '/settings/roles', icon: ShieldCheck, resource: 'roles', action: 'read' },
     ],
   },
 ];
 
 export const getProfileMenuItems = (
-  t: (key: string) => string,
+  _t: (key: string) => string,
   navigate: (path: string) => void,
   setLogoutDialogOpen: (open: boolean) => void,
-): ProfileMenuItem[] => {
-  return [
-    {
-      name: t('profile.myProfile'),
-      href: '/profile',
-      icon: User,
-      onClick: () => navigate('/profile'),
-    },
-    {
-      name: t('profile.logout'),
-      href: '#',
-      icon: LogOut,
-      onClick: () => setLogoutDialogOpen(true),
-    },
-  ];
-};
+): ProfileMenuItem[] => [
+  {
+    name: 'Meu perfil',
+    href: '/profile',
+    icon: User,
+    onClick: () => navigate('/profile'),
+  },
+  {
+    name: 'Sair',
+    href: '#',
+    icon: LogOut,
+    onClick: () => setLogoutDialogOpen(true),
+  },
+];
 
-// Função utilitária para verificar se um item de menu deve ser exibido
 export const shouldShowMenuItem = (
   item: MenuItem | SubMenuItem,
   canFunction: (resource: string, action: string) => boolean,
   canAnyFunction: (permissions: string[]) => boolean,
   canAllFunction: (permissions: string[]) => boolean,
-  userRoleKey?: string
+  userRoleKey?: string,
 ): boolean => {
-  // Verificar role obrigatória
   if (item.requiredRoleKey) {
     return userRoleKey === item.requiredRoleKey;
   }
 
-  // Verificar permissões específicas
-  if (item.permissions && item.permissions.length > 0) {
+  if (item.permissions?.length) {
     return item.requireAll
       ? canAllFunction(item.permissions)
       : canAnyFunction(item.permissions);
   }
 
-  // Verificar permissão resource.action
   if (item.resource && item.action) {
     return canFunction(item.resource, item.action);
   }
 
-  // Se não há permissões específicas, permitir acesso para usuários autenticados
   return true;
 };
 
-// Função para filtrar menus baseado em permissões
 export const filterMenuItemsByPermissions = (
   items: MenuItem[],
   canFunction: (resource: string, action: string) => boolean,
   canAnyFunction: (permissions: string[]) => boolean,
   canAllFunction: (permissions: string[]) => boolean,
-  userRoleKey?: string
-): MenuItem[] => {
-  return items
-    .filter(item => shouldShowMenuItem(item, canFunction, canAnyFunction, canAllFunction, userRoleKey))
+  userRoleKey?: string,
+): MenuItem[] =>
+  items
+    .filter(item =>
+      shouldShowMenuItem(item, canFunction, canAnyFunction, canAllFunction, userRoleKey),
+    )
     .map(item => {
-      // Se o item tem subitens, filtrar os subitens também
-      if (item.subItems && item.subItems.length > 0) {
-        const filteredSubItems = item.subItems.filter(subItem =>
-          shouldShowMenuItem(subItem, canFunction, canAnyFunction, canAllFunction, userRoleKey)
-        );
+      if (!item.subItems?.length) return item;
 
-        // Se não há subitens visíveis, não mostrar o item pai
-        if (filteredSubItems.length === 0) {
-          return null;
-        }
+      const subItems = item.subItems.filter(subItem =>
+        shouldShowMenuItem(
+          subItem,
+          canFunction,
+          canAnyFunction,
+          canAllFunction,
+          userRoleKey,
+        ),
+      );
 
-        return {
-          ...item,
-          subItems: filteredSubItems
-        };
-      }
-
-      return item;
+      return subItems.length ? { ...item, subItems } : null;
     })
     .filter((item): item is MenuItem => item !== null);
-};

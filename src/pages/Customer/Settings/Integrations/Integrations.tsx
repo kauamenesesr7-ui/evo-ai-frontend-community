@@ -20,7 +20,6 @@ import { Integration, IntegrationCategory } from '@/types/integrations';
 import { IntegrationCard } from '@/components/integrations/base';
 import { toast } from 'sonner';
 import { usePermissions } from '@/contexts/PermissionsContext';
-import { useGlobalConfig } from '@/contexts/GlobalConfigContext';
 
 // Integration categories for organization - will be translated
 const getIntegrationCategories = (t: (key: string) => string): IntegrationCategory[] => [
@@ -61,7 +60,6 @@ const INTEGRATION_CATEGORY_MAP: Record<string, string> = {
 export default function Integrations() {
   const { t } = useLanguage('integrations');
   const { can, isReady: permissionsReady } = usePermissions();
-  const { openaiConfigured } = useGlobalConfig();
   const navigate = useNavigate();
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
@@ -169,9 +167,7 @@ export default function Integrations() {
     }
   };
 
-  const visibleIntegrations = integrations.filter(
-    integration => !(integration.id === 'openai' && openaiConfigured),
-  );
+  const visibleIntegrations = integrations.filter(integration => integration.id !== 'openai');
 
   // Filter integrations
   const filteredIntegrations = visibleIntegrations.filter(integration => {

@@ -3,6 +3,7 @@ import type { PaginatedResponse, StandardResponse, PaginationMeta } from '@/type
 export type ProductKind = 'physical' | 'digital';
 export type ProductStatus = 'active' | 'inactive' | 'draft';
 export type ProductCurrency = 'BRL' | 'USD' | 'EUR';
+export type RentalCategory = 'inflatable' | 'mobile_buffet';
 
 export interface ProductVariant {
   id: string;
@@ -38,6 +39,7 @@ export interface Product {
   currency: ProductCurrency;
   purchase_url?: string | null;
   status: ProductStatus;
+  rental_category: RentalCategory;
   stock_quantity?: number | null;
   metadata?: Record<string, unknown>;
   labels?: string[];
@@ -61,6 +63,7 @@ export interface ProductFormData {
   currency: ProductCurrency;
   purchase_url?: string;
   status: ProductStatus;
+  rental_category: RentalCategory;
   stock_quantity?: number | null;
   labels?: string[];
   variants_attributes?: ProductVariantFormData[];
@@ -86,6 +89,7 @@ export interface ProductsListParams {
   q?: string;
   kind?: ProductKind;
   status?: ProductStatus;
+  rental_category?: RentalCategory;
 }
 
 /* ---------- Bulk import (EVO-1555 S1 + S1.1 dry-run) ---------- */
