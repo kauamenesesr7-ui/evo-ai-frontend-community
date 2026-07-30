@@ -80,7 +80,7 @@ import ShopifyPage from '../pages/Customer/Settings/Integrations/ShopifyPage';
 import LinearPage from '../pages/Customer/Settings/Integrations/LinearPage';
 import DashboardAppPage from '../pages/Customer/DashboardApp';
 import { Rentals, Finance, Reminders, Contracts, Subscription } from '@/pages/Customer/Business';
-import AppEventosAdmin from '@/pages/Admin/AppEventosAdmin';
+const AppEventosAdmin = React.lazy(() => import('@/pages/Admin/AppEventosAdmin'));
 
 // Páginas admin
 const RolesList = React.lazy(() => import('@/pages/Admin/Roles/RolesList'));
@@ -1389,7 +1389,9 @@ const AppRouter = () => {
               <PrivateRoute>
                 <AdminRoute>
                   <MainLayout>
-                    <AppEventosAdmin />
+                    <Suspense fallback={<div className="p-8">Carregando administração...</div>}>
+                      <AppEventosAdmin />
+                    </Suspense>
                   </MainLayout>
                 </AdminRoute>
               </PrivateRoute>

@@ -24,6 +24,8 @@ import {
   SuperAdminOverview,
   superAdminOverviewService,
 } from '@/services/superAdmin/overviewService';
+import { ApiKeysModal } from '@/components/ApiKeysModal';
+import { Button } from '@evoapi/design-system';
 
 const summaryCards = [
   ['Empresas', 'tenants', Building2],
@@ -40,6 +42,7 @@ const number = new Intl.NumberFormat('pt-BR');
 const AppEventosAdmin = () => {
   const [overview, setOverview] = useState<SuperAdminOverview | null>(null);
   const [error, setError] = useState('');
+  const [aiProfilesOpen, setAiProfilesOpen] = useState(false);
 
   useEffect(() => {
     superAdminOverviewService.get().then(setOverview).catch(() => {
@@ -174,9 +177,13 @@ const AppEventosAdmin = () => {
             <AlertDescription>
               Provedor, modelo e chaves ficam no servidor e nunca são enviados aos clientes.
             </AlertDescription>
+            <Button className="mt-3" size="sm" onClick={() => setAiProfilesOpen(true)}>
+              Gerenciar perfis privados
+            </Button>
           </Alert>
         </div>
       </div>
+      <ApiKeysModal open={aiProfilesOpen} onOpenChange={setAiProfilesOpen} />
     </div>
   );
 };

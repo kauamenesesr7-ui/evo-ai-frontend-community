@@ -5,7 +5,8 @@ export type BusinessResource =
   | 'rentals'
   | 'financial_entries'
   | 'business_reminders'
-  | 'contracts';
+  | 'contracts'
+  | 'contract_templates';
 
 export type BusinessRecord = Record<string, unknown> & { id: string };
 

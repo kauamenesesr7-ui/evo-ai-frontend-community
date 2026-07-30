@@ -11,7 +11,6 @@ import { Agent, AGENT_FILTER_TYPES } from '@/types/agents';
 import { buildAppliedFilterChips } from '@/utils/appliedFilterChips';
 import type { BaseFilter, AppliedFilter } from '@/types/core';
 import { useLanguage } from '@/hooks/useLanguage';
-import { ApiKeysModal } from '@/components/ApiKeysModal';
 import { AgentsTour } from '@/tours';
 import { useDarkMode } from '@/hooks/useDarkMode';
 import type { PaginationMeta } from '@/types/core';
@@ -48,7 +47,6 @@ const Agentes = () => {
   useDarkMode();
 
   const [state, setState] = useState<AgentsState>(INITIAL_STATE);
-  const [isApiKeysModalOpen, setIsApiKeysModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -303,7 +301,6 @@ const Agentes = () => {
               searchValue={searchTerm}
               onSearchChange={setSearchTerm}
               onNewAgent={handleCreateAgent}
-              onManageApiKeys={() => setIsApiKeysModalOpen(true)}
               onBulkDelete={handleBulkDelete}
               onClearSelection={() => setState(prev => ({ ...prev, selectedAgents: [] }))}
               onFilter={handleOpenFilter}
@@ -376,8 +373,6 @@ const Agentes = () => {
           </div>
         </div>
       )}
-
-      <ApiKeysModal open={isApiKeysModalOpen} onOpenChange={setIsApiKeysModalOpen} />
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>

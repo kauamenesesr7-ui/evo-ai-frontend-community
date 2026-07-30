@@ -8,7 +8,6 @@ import {
   Label,
   Input,
   Button,
-  Badge,
   Select,
   SelectContent,
   SelectItem,
@@ -38,8 +37,6 @@ import {
   ShoppingCart,
   ChevronDown,
 } from 'lucide-react';
-import { ApiKeysModal } from '@/components/ApiKeysModal';
-import ModelSelector from '@/components/ai_agents/ModelSelector';
 import ExternalAgentConfig from '@/components/agents/ExternalAgentConfig';
 import { ExternalAgentConfigData } from '@/components/agents/ExternalAgentConfig';
 import { AdvancedBotConfigData } from '@/components/ai_agents/Forms/AdvancedBotConfig';
@@ -97,7 +94,6 @@ export const GeneralTab = ({
   a2aConfigData,
   taskConfigData,
   externalConfigData,
-  apiKeys,
   behaviorSettings,
   onLLMConfigChange,
   onA2AConfigChange,
@@ -107,27 +103,12 @@ export const GeneralTab = ({
   onShowTransferRulesModal,
   onShowPipelineRulesModal,
   onShowContactEditModal,
-  onInstructionSync,
-  onApiKeysReload,
 }: GeneralTabProps) => {
   const { t } = useLanguage('aiAgents');
-  const [showApiKeysModal, setShowApiKeysModal] = useState(false);
 
-  // Estado de abertura dos 3 grupos colapsáveis (abertos por padrão para não esconder config existente)
-  const [openModel, setOpenModel] = useState(true);
+  // Estado dos grupos operacionais que continuam editáveis pelos clientes.
   const [openBehavior, setOpenBehavior] = useState(true);
   const [openMessages, setOpenMessages] = useState(true);
-
-  // Handler para mudanças no LLM config
-  const handleLLMConfigChange = useCallback(
-    (data: LLMConfigData) => {
-      onLLMConfigChange(data);
-      if (onInstructionSync) {
-        onInstructionSync(data.instruction);
-      }
-    },
-    [onLLMConfigChange, onInstructionSync]
-  );
 
   // Handler para mudanças no advanced bot config (LLM)
   const handleAdvancedBotConfigChange = useCallback(
@@ -194,97 +175,20 @@ export const GeneralTab = ({
   return (
     <>
       <div className="space-y-8">
-        {/* Grupo 1: Modelo e API (apenas para LLM) — colapsável */}
+        {/* O runtime de IA é privado e atribuído no backend pelo superadmin. */}
         {supportsModelConfig(agent.type) && llmConfigData && (
-          <Collapsible
-            open={openModel}
-            onOpenChange={setOpenModel}
-            className="space-y-4"
-          >
-            <CollapsibleTrigger
-              className="flex w-full items-center gap-3 pb-2 border-b text-left"
-              aria-expanded={openModel}
-            >
-              <span className="p-2 rounded-lg bg-primary/10">
-                <Key className="h-5 w-5 text-primary" />
-              </span>
-              <span className="flex-1">
-                <span className="block text-lg font-semibold">
-                  {t('edit.configuration.sections.modelAndApi.title') || 'Modelo e API'}
-                </span>
-                <span className="block text-sm text-muted-foreground">
-                  {t('edit.configuration.sections.modelAndApi.subtitle') ||
-                    'Configure o modelo de linguagem e a chave de API'}
-                </span>
-              </span>
-              <ChevronDown
-                className={`h-5 w-5 text-muted-foreground transition-transform ${openModel ? 'rotate-180' : ''}`}
-              />
-            </CollapsibleTrigger>
-
-            <CollapsibleContent className="space-y-6 pl-11">
-              {/* Chave API */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="apiKey" className="text-sm font-medium">
-                    {t('llmConfig.apiKey')} <span className="text-red-500">*</span>
-                  </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowApiKeysModal(true)}
-                    className="h-8 px-3"
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    {t('llmConfig.manageApiKeys')}
-                  </Button>
-                </div>
-                <Select
-                  value={llmConfigData.api_key_id || ''}
-                  onValueChange={value =>
-                    handleLLMConfigChange({
-                      ...llmConfigData,
-                      api_key_id: value,
-                    })
-                  }
-                >
-                  <SelectTrigger id="apiKey" className="w-80">
-                    <SelectValue placeholder={t('llmConfig.selectApiKey')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {apiKeys
-                      .filter(key => key.is_active)
-                      .map(apiKey => (
-                        <SelectItem key={apiKey.id} value={apiKey.id}>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{apiKey.name}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {apiKey.provider}
-                            </Badge>
-                          </div>
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">{t('llmConfig.apiKeyDescription')}</p>
-              </div>
-
-              {/* Modelo */}
-              <ModelSelector
-                value={llmConfigData.model || ''}
-                onChange={model =>
-                  handleLLMConfigChange({
-                    ...llmConfigData,
-                    model,
-                  })
-                }
-                apiKeys={apiKeys}
-                apiKeyId={llmConfigData.api_key_id}
-                required
-              />
-            </CollapsibleContent>
-          </Collapsible>
+          <div className="flex items-start gap-3 rounded-xl border border-violet-500/25 bg-violet-500/5 p-4">
+            <span className="rounded-lg bg-violet-500/15 p-2">
+              <Key className="h-5 w-5 text-violet-500" />
+            </span>
+            <div>
+              <p className="font-semibold">Tecnologia gerenciada pela AppEventos</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                O modelo, o provedor e as credenciais são definidos com segurança pelo
+                administrador da plataforma. Configure abaixo apenas o comportamento do agente.
+              </p>
+            </div>
+          </div>
         )}
 
         {/* Para A2A e Task: Formulário específico */}
@@ -1144,14 +1048,6 @@ export const GeneralTab = ({
         )}
       </div>
 
-      {/* Modal de Gerenciamento de Chaves API */}
-      {supportsModelConfig(agent.type) && (
-        <ApiKeysModal
-          open={showApiKeysModal}
-          onOpenChange={setShowApiKeysModal}
-          onApiKeysChange={onApiKeysReload}
-        />
-      )}
     </>
   );
 };

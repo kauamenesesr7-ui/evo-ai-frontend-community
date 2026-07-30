@@ -1,6 +1,5 @@
 import {
   Plus,
-  Key,
   Trash2,
 } from 'lucide-react';
 import { BaseHeader, HeaderAction, HeaderFilter } from '@/components/base';
@@ -13,7 +12,6 @@ interface AgentsHeaderProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onNewAgent: () => void;
-  onManageApiKeys: () => void;
   onBulkDelete: () => void;
   onClearSelection: () => void;
   onFilter?: () => void;
@@ -27,7 +25,6 @@ export default function AgentsHeader({
   searchValue,
   onSearchChange,
   onNewAgent,
-  onManageApiKeys,
   onBulkDelete,
   onClearSelection,
   onFilter,
@@ -43,16 +40,6 @@ export default function AgentsHeader({
     onClick: onNewAgent,
     dataTour: 'agents-new-button',
   } : undefined;
-
-  const secondaryActions: HeaderAction[] = [
-    {
-      label: t('apiKeys.manage'),
-      icon: <Key className="h-4 w-4" />,
-      onClick: onManageApiKeys,
-      variant: 'outline' as const,
-      dataTour: 'agents-api-keys',
-    },
-  ];
 
   const bulkActions: HeaderAction[] = isReady && can('ai_agents', 'delete') ? [
     {
@@ -73,7 +60,6 @@ export default function AgentsHeader({
       onSearchChange={onSearchChange}
       searchPlaceholder={t('search.placeholder')}
       primaryAction={primaryAction}
-      secondaryActions={secondaryActions}
       bulkActions={bulkActions}
       filters={activeFilters}
       onFilterClick={onFilter ?? (() => {})}
